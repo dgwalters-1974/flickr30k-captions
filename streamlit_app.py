@@ -8,7 +8,7 @@ from model import TransformerDecoderCaption  # Import your trained model
 
 # ======= CONFIGURATION ======= #
 DEVICE = torch.device("cuda" if torch.cuda.is_available() else "cpu")
-IMG_DIR = "archive/flickr30k_images/"
+IMG_DIR = "data/"#archive/flickr30k_images/"
 DECODER_PATH = "caption_decoder.pth"
 CLIP_MODEL_NAME = "openai/clip-vit-base-patch32"
 

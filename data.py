@@ -35,8 +35,21 @@ class Flickr30kDataset(Dataset):
         return len(self.captions_df)
     
     def __getitem__(self, idx):
-        row = self.captions_df.iloc[idx]
-        img_path = os.path.join(self.img_dir, row['image_name'])
+        item = self.captions_df.iloc[idx]
+        
+        # Handle missing or NaN captions
+        if 'comment' not in item or pd.isna(item['comment']):
+            caption = "No caption available"  # Default caption for missing/nan values
+        else:
+            if isinstance(item['comment'], (list, tuple)):
+                caption = item['comment'][0] if item['comment'] else "No caption available"
+            else:
+                caption = str(item['comment'])
+        
+        if caption == "nan" or pd.isna(caption):
+            caption = "No caption available"
+        
+        img_path = os.path.join(self.img_dir, item['image_name'])
 
         if not os.path.exists(img_path):
             raise FileNotFoundError(f"Image not found: {img_path}")
@@ -49,9 +62,15 @@ class Flickr30kDataset(Dataset):
             # Use get_image_features instead of vision_model
             image_features = self.clip_model.get_image_features(**image_inputs)
 
-        # Process caption
+        # Debug prints
+        
+        
         caption_inputs = self.processor(
-            text=row['comment'], padding="max_length", truncation=True, max_length=50, return_tensors="pt"
+            text=caption,
+            padding='max_length',
+            truncation=True,
+            max_length=50,
+            return_tensors='pt'
         )
 
         caption_ids = caption_inputs["input_ids"].squeeze(0)
