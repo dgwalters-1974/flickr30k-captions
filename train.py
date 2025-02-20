@@ -15,7 +15,7 @@ IMG_DIR = "/Users/dgwalters/ML Projects/MLX-4/CaptionGeneration/archive/flickr30
 CAPTIONS_FILE = "/Users/dgwalters/ML Projects/MLX-4/CaptionGeneration/archive/captions.txt"
 CLIP_MODEL = "openai/clip-vit-base-patch32"
 BATCH_SIZE = 32
-LEARNING_RATE = 1e-4
+LEARNING_RATE = 1e-3
 NUM_EPOCHS = 2
 
 # Initialize wandb
