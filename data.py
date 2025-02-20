@@ -18,6 +18,12 @@ class Flickr30kDataset(Dataset):
         # Clean up image names by removing any whitespace
         self.captions_df['image_name'] = self.captions_df['image_name'].str.strip()
         
+        # Store the last 100 rows separately
+        self.unseen_captions_df = self.captions_df.iloc[-100:]
+        
+        # Ignore the last 100 rows in main dataset
+        self.captions_df = self.captions_df.iloc[:-100]
+        
         if subset_size:
             if random_subset:
                 self.captions_df = self.captions_df.sample(n=subset_size, random_state=42).reset_index(drop=True)
@@ -78,3 +84,19 @@ class Flickr30kDataset(Dataset):
 
         return image_features.squeeze(0), caption_ids, caption_mask
 
+    def save_unseen_images(self, save_dir):
+        unseen_images_dir = os.path.join(save_dir, "UnseenImages", "images")
+        unseen_captions_file = os.path.join(save_dir, "UnseenImages", "captions.txt")
+        
+        os.makedirs(unseen_images_dir, exist_ok=True)
+        
+        with open(unseen_captions_file, "w") as f:
+            for _, row in self.unseen_captions_df.iterrows():
+                img_path = os.path.join(self.img_dir, row['image_name'])
+                save_path = os.path.join(unseen_images_dir, row['image_name'])
+                
+                if os.path.exists(img_path):
+                    image = Image.open(img_path).convert('RGB')
+                    image.save(save_path)
+                
+                f.write(f"{row['image_name']},{row['comment_number']},{row['comment']}\n")
