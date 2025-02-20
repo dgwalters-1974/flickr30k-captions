@@ -3,6 +3,8 @@ import torch.nn as nn
 import torch.optim as optim
 import math
 
+###  75,842,816 parameters
+
 class PositionalEncoding(nn.Module):
     def __init__(self, d_model, max_seq_length=200):
         super().__init__()

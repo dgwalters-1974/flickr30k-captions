@@ -5,8 +5,10 @@ import argparse
 from model import TransformerDecoderCaption  # Import your trained model
 import os
 
+DECODER = "/Users/dgwalters/ML Projects/MLX-4/CaptionGeneration/caption_decoder_20250220_165701.pth"
 
-def load_models(clip_model_name="openai/clip-vit-base-patch32", decoder_path="caption_decoder.pth", device="cuda"):
+
+def load_models(clip_model_name="openai/clip-vit-base-patch32", decoder_path=DECODER, device="cuda"):
     """
     Load the CLIP model for image embeddings and the trained Transformer decoder for caption generation.
     """
@@ -70,7 +72,7 @@ def generate_caption(image_embedding, decoder, clip_processor, max_length=50):
     return caption
 
 
-def main(image_path, decoder_path="caption_decoder.pth", clip_model_name="openai/clip-vit-base-patch32", device="cuda"):
+def main(image_path, decoder_path=DECODER, clip_model_name="openai/clip-vit-base-patch32", device="cuda"):
     """
     Runs the full inference pipeline to generate a caption for an image.
     """
@@ -92,7 +94,7 @@ def main(image_path, decoder_path="caption_decoder.pth", clip_model_name="openai
 if __name__ == "__main__":
     parser = argparse.ArgumentParser(description="Generate a caption for an image using a trained Transformer decoder.")
     parser.add_argument("image_path", type=str, help="Path to the image file.")
-    parser.add_argument("--decoder_path", type=str, default="caption_decoder.pth", help="Path to trained decoder model.")
+    parser.add_argument("--decoder_path", type=str, default=DECODER, help="Path to trained decoder model.")
     parser.add_argument("--clip_model", type=str, default="openai/clip-vit-base-patch32", help="CLIP model variant.")
     parser.add_argument("--device", type=str, default="cuda", help="Device to run inference on (cuda/cpu).")
 
@@ -123,7 +125,7 @@ if __name__ == "__main__":
 #         return self.proj(x)
 
 
-# def load_models(clip_model_name="openai/clip-vit-base-patch32", decoder_path="caption_decoder.pth", device="cuda"):
+# def load_models(clip_model_name="openai/clip-vit-base-patch32", decoder_path=DECODER, device="cuda"):
 #     """
 #     Load the CLIP model for image embeddings and the trained Transformer decoder for caption generation.
 #     """
@@ -198,7 +200,7 @@ if __name__ == "__main__":
 # # ===========================
 # # 4️⃣ Main Function for Inference
 # # ===========================
-# def main(image_path, decoder_path="caption_decoder.pth", clip_model_name="openai/clip-vit-base-patch32", device="cuda"):
+# def main(image_path, decoder_path=DECODER, clip_model_name="openai/clip-vit-base-patch32", device="cuda"):
 #     """
 #     Runs the full inference pipeline to generate a caption for an image.
 #     """
@@ -222,7 +224,7 @@ if __name__ == "__main__":
 # if __name__ == "__main__":
 #     parser = argparse.ArgumentParser(description="Generate a caption for an image using a trained Transformer decoder.")
 #     parser.add_argument("image_path", type=str, help="Path to the image file.")
-#     parser.add_argument("--decoder_path", type=str, default="caption_decoder.pth", help="Path to trained decoder model.")
+#     parser.add_argument("--decoder_path", type=str, default=DECODER, help="Path to trained decoder model.")
 #     parser.add_argument("--clip_model", type=str, default="openai/clip-vit-base-patch32", help="CLIP model variant.")
 #     parser.add_argument("--device", type=str, default="cuda", help="Device to run inference on (cuda/cpu).")
 

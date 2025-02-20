@@ -5,16 +5,18 @@ from torch.utils.data import DataLoader
 from data import Flickr30kDataset
 from model import TransformerDecoderCaption
 import wandb
+import datetime
 from tqdm.auto import tqdm
+from datetime import datetime
 
 # ======= CONFIGURATION ======= #
 DEVICE = torch.device("cuda" if torch.cuda.is_available() else "cpu")
-IMG_DIR = "/root/flickr30k-captions/archive/flickr30k_images"
-CAPTIONS_FILE = "/root/flickr30k-captions/archive/captions.txt"
+IMG_DIR = "/Users/dgwalters/ML Projects/MLX-4/CaptionGeneration/archive/flickr30k_images"
+CAPTIONS_FILE = "/Users/dgwalters/ML Projects/MLX-4/CaptionGeneration/archive/captions.txt"
 CLIP_MODEL = "openai/clip-vit-base-patch32"
-BATCH_SIZE = 64
-LEARNING_RATE = 1e-3
-NUM_EPOCHS = 1
+BATCH_SIZE = 32
+LEARNING_RATE = 1e-4
+NUM_EPOCHS = 2
 
 # Initialize wandb
 wandb.init(
@@ -28,7 +30,7 @@ wandb.init(
 )
 
 # ======= LOAD DATASET ======= #
-dataset = Flickr30kDataset(img_dir=IMG_DIR, captions_file=CAPTIONS_FILE, clip_model='openai/clip-vit-base-patch32', subset_size=None)
+dataset = Flickr30kDataset(img_dir=IMG_DIR, captions_file=CAPTIONS_FILE, clip_model='openai/clip-vit-base-patch32', subset_size=5000)
 dataloader = DataLoader(dataset, batch_size=BATCH_SIZE, shuffle=True, num_workers=0)
 
 # ======= MODEL SETUP ======= #
@@ -80,8 +82,10 @@ for epoch in range(NUM_EPOCHS):
     })
 
 # Save the trained model
-torch.save(model.state_dict(), "caption_decoder_1.pth")
-print("Model saved!")
+timestamp = datetime.now().strftime('%Y%m%d_%H%M%S')
+model_path = f"caption_decoder_{timestamp}.pth"
+torch.save(model.state_dict(), model_path)
+print(f"Model saved to {model_path}!")
 
 # Close wandb run
 wandb.finish()
