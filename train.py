@@ -15,7 +15,7 @@ IMG_DIR = "/Users/dgwalters/ML Projects/MLX-4/CaptionGeneration/archive/flickr30
 CAPTIONS_FILE = "/Users/dgwalters/ML Projects/MLX-4/CaptionGeneration/archive/captions.txt"
 CLIP_MODEL = "openai/clip-vit-base-patch32"
 BATCH_SIZE = 32
-LEARNING_RATE = 1e-3
+LEARNING_RATE = 5e-4
 NUM_EPOCHS = 2
 
 # Initialize wandb
@@ -30,12 +30,12 @@ wandb.init(
 )
 
 # ======= LOAD DATASET ======= #
-dataset = Flickr30kDataset(img_dir=IMG_DIR, captions_file=CAPTIONS_FILE, clip_model='openai/clip-vit-base-patch32', subset_size=5000)
+dataset = Flickr30kDataset(img_dir=IMG_DIR, captions_file=CAPTIONS_FILE, clip_model='openai/clip-vit-base-patch32', subset_size=None)
 dataloader = DataLoader(dataset, batch_size=BATCH_SIZE, shuffle=True, num_workers=0)
 
 # ======= MODEL SETUP ======= #
 VOCAB_SIZE = dataset.processor.tokenizer.vocab_size
-model = TransformerDecoderCaption(vocab_size=VOCAB_SIZE, d_model=512, num_heads=8, num_layers=6, dropout=0.1).to(DEVICE)
+model = TransformerDecoderCaption(vocab_size=VOCAB_SIZE, d_model=512, num_heads=8, num_layers=3, dropout=0.2).to(DEVICE)
 
 criterion = nn.CrossEntropyLoss(ignore_index=0)
 optimizer = optim.Adam(model.parameters(), lr=LEARNING_RATE)

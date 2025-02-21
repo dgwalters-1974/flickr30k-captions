@@ -1,0 +1,12 @@
+What I built:
+    - A caption generation model that uses a transformer decoder to generate captions for images.
+    - Cross attention blocks to combine CLIP image embeddings with the caption decoder.
+    - Roughly 75mm parameters
+    - 8 attention heads
+    - 6 layers etc etc
+    - Rubbish results (see pics)
+Learnings:
+    - If something works, don't break it.
+    - Training on a GPU (especially with a mac) is a minefield.
+    - Wouldn't have been able to get to the end of the week without Claude.
+    - Same as previous weeks, pays to start with a simple model and iterate.

@@ -5,13 +5,14 @@ from PIL import Image
 import os
 from model import TransformerDecoderCaption
 
-# Configuration
+# Configuration - use same path as inference.py
+DECODER = "/Users/dgwalters/ML Projects/MLX-4/CaptionGeneration/caption_decoder_20250220_165701.pth"
 DEVICE = torch.device("cuda" if torch.cuda.is_available() else "cpu")
-DECODER_PATH = "/Users/dgwalters/ML Projects/MLX-4/CaptionGeneration/caption_decoder_20250221_151104.pth"
 CLIP_MODEL_NAME = "openai/clip-vit-base-patch32"
 
-def load_models(clip_model_name=CLIP_MODEL_NAME, decoder_path=DECODER_PATH, device="cuda"):
-    """Load models using exact same logic as inference.py"""
+@st.cache_resource
+def load_models(clip_model_name=CLIP_MODEL_NAME, decoder_path=DECODER, device="cuda"):
+    """Exact same loading function as inference.py"""
     device = torch.device(device if torch.cuda.is_available() else "cpu")
     
     clip_processor = CLIPProcessor.from_pretrained(clip_model_name)
@@ -19,7 +20,7 @@ def load_models(clip_model_name=CLIP_MODEL_NAME, decoder_path=DECODER_PATH, devi
     
     decoder = TransformerDecoderCaption(
         vocab_size=clip_processor.tokenizer.vocab_size,
-        d_model=512,
+        d_model=512,  # Ensure consistent embedding dimension
         num_heads=8,
         num_layers=6
     ).to(device)
@@ -30,21 +31,19 @@ def load_models(clip_model_name=CLIP_MODEL_NAME, decoder_path=DECODER_PATH, devi
     return clip_processor, clip_model, decoder, device
 
 def get_clip_embedding(image_path, clip_processor, clip_model, device):
-    """Extract CLIP embedding with same debug prints as inference.py"""
-    st.write(f"📷 Processing Image: {os.path.basename(image_path)}")
-    st.write(f"Processing Image: {image_path}")
-    
+    """Exact same embedding function as inference.py"""
+    print(f"Processing Image: {image_path}")
     image = Image.open(image_path).convert("RGB")
     inputs = clip_processor(images=image, return_tensors="pt").to(device)
 
     with torch.no_grad():
         image_embedding = clip_model.get_image_features(**inputs)
     
-    st.write(f"CLIP embedding dimension: {image_embedding.shape}")
+    print(f"CLIP embedding dimension: {image_embedding.shape}")
     return image_embedding
 
 def generate_caption(image_embedding, decoder, clip_processor, max_length=50):
-    """Generate caption using same logic as inference.py"""
+    """Exact same caption generation as inference.py"""
     device = image_embedding.device
     sos_token = clip_processor.tokenizer.bos_token_id
     eos_token = clip_processor.tokenizer.eos_token_id
@@ -77,34 +76,37 @@ except Exception as e:
 uploaded_file = st.file_uploader("Choose an image...", type=["jpg", "jpeg", "png"])
 
 if uploaded_file is not None:
-    # Save uploaded file
-    temp_dir = "unseen_images"
-    os.makedirs(temp_dir, exist_ok=True)
-    temp_path = os.path.join(temp_dir, uploaded_file.name)
-    
+    # Save uploaded file temporarily to use same path-based logic as inference.py
+    temp_path = "temp_upload.jpg"
     with open(temp_path, "wb") as f:
         f.write(uploaded_file.getbuffer())
     
-    # Display image - fixed deprecation warning
-    image = Image.open(temp_path)
-    st.image(image, use_container_width=False)  # Display at original size
+    # Display image
+    st.image(uploaded_file, use_container_width=True)
     
-    # Generate caption with debug info
+    # Generate caption using exact same process as inference.py
     with st.spinner("Generating caption..."):
-        image_embedding = get_clip_embedding(temp_path, clip_processor, clip_model, device)
-        st.write(f"Image embedding shape before generation: {image_embedding.shape}")
+        st.write(f"\n📷 Processing Image: {os.path.basename(temp_path)}")
         
+        # Get embedding
+        image_embedding = get_clip_embedding(temp_path, clip_processor, clip_model, device)
+        st.write(f"Image embedding shape: {image_embedding.shape}")
+        
+        # Generate caption
         caption = generate_caption(image_embedding, decoder, clip_processor)
-        st.write("\n📝 Generated Caption:", caption)
+        
+        # Display caption
+        st.write("\n📝 Generated Caption:")
+        st.markdown(f"**{caption}**")
     
-    # Clean up
+    # Clean up temp file
     os.remove(temp_path)
 
 # Add some instructions at the bottom
 st.markdown("""
 ---
 ### Instructions:
-1. Click 'Browse files' or drag and drop an image
-2. The model will automatically generate a caption
-3. Try different images to see how the model performs!
+1. Drag and drop image onto the top bit...
+2. The model will  generate a caption
+3. Be amazed
 """)
